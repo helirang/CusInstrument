@@ -713,6 +713,8 @@ GameObject:
   m_Component:
   - component: {fileID: 600605166}
   - component: {fileID: 600605167}
+  - component: {fileID: 600605168}
+  - component: {fileID: 600605169}
   m_Layer: 0
   m_Name: Piano
   m_TagString: Untagged
@@ -747,12 +749,43 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6262f5fadbfd81d40b7401ae1b3575d0, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  instrumentName: Piano
+  instrumentMode: 0
   sfx: 
-  pianoAudioClips: []
+  soundTracks: {fileID: 0}
   customAudioClips: []
+  pianoAudioClips: []
   pianoSoundTracks: {fileID: 11400000, guid: 66fbd039a974f9e4dbb0ecceec47ad7d, type: 2}
-  instrumentMode: {fileID: 11400000, guid: 6da49a10f325cb2489805b27b2729d15, type: 2}
+  instrumentModeSO: {fileID: 11400000, guid: 6da49a10f325cb2489805b27b2729d15, type: 2}
+  recordData: {fileID: 11400000, guid: 0e3d821e5644a9c4594add17a8d623ce, type: 2}
+--- !u!114 &600605168
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 600605165}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 96d5f37524da33846b74811eba815551, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  instrumentSoundTracks: {fileID: 11400000, guid: 66fbd039a974f9e4dbb0ecceec47ad7d,
+    type: 2}
+  currentAudioClips: []
+--- !u!114 &600605169
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 600605165}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: db92046822edcd24286c88abdb9f172c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  audioClips: []
+  audioTypeName: aiFf
 --- !u!1 &633206598
 GameObject:
   m_ObjectHideFlags: 0
@@ -3071,9 +3104,9 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 1067997697}
-        m_TargetAssemblyTypeName: SoundLoader, Assembly-CSharp
-        m_MethodName: AudioLoad
+      - m_Target: {fileID: 0}
+        m_TargetAssemblyTypeName: MusicRecorder, Assembly-CSharp
+        m_MethodName: StartRecorde
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}

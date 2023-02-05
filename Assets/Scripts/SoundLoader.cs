@@ -8,7 +8,7 @@ public class SoundLoader : MonoBehaviour
     [SerializeField]List<AudioClip> audioClips;
     string directoryPath;
     public string audioTypeName = "aiFf";
-    int soundMax = 12;
+    int soundMax = 14;
 
     private void Awake()
     {
@@ -42,6 +42,7 @@ public class SoundLoader : MonoBehaviour
             if (req.result == UnityWebRequest.Result.ConnectionError || req.result == UnityWebRequest.Result.ProtocolError)
             {
                 Debug.LogWarning(req.error + "\n" + filePath);
+                LoadErr(req.error + "\n" + filePath);
             }
             else
             {
@@ -50,8 +51,18 @@ public class SoundLoader : MonoBehaviour
                 audioClips.Add(audioClip);
 
                 //비동기로딩으로 사운드가 빠른 순서대로 로드 됨. 따라서 마지막 사운드 로드되면 한번 정렬시킨다.
-                if (audioClips.Count == soundMax) audioClips.Sort((p1,p2)=>int.Parse(p1.name).CompareTo(int.Parse(p2.name)));
+                if (audioClips.Count == soundMax) ComplteLoad();
             }
         }
+    }
+
+    private void ComplteLoad()
+    {
+        audioClips.Sort((p1, p2) => int.Parse(p1.name).CompareTo(int.Parse(p2.name)));
+    }
+
+    private void LoadErr(string errMsg)
+    {
+        //에러 매니저 만들기
     }
 }

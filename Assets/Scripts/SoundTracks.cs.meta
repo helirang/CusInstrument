@@ -1,0 +1,12 @@
+fileFormatVersion: 2
+guid: 96d5f37524da33846b74811eba815551
+MonoImporter:
+  externalObjects: {}
+  serializedVersion: 2
+  defaultReferences:
+  - pianoSoundTracks: {fileID: 11400000, guid: 66fbd039a974f9e4dbb0ecceec47ad7d, type: 2}
+  executionOrder: 0
+  icon: {instanceID: 0}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
