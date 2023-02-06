@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 
 public class MusicRecorder
@@ -7,43 +8,59 @@ public class MusicRecorder
     /// <summary>
     /// 유저가 누른 건반 번호
     /// </summary>
-    List<int> inputData;
+    List<int> inputData = new List<int>();
     /// <summary>
     /// 유저가 건반을 누른 시간
     /// </summary>
-    List<float> inputTimeData;
+    List<float> inputTimeData = new List<float>();
+
+    /// <summary>
+    /// 깊은 복사를 하는 백업용 데이터들
+    /// </summary>
+    List<int> backUpInputData = new List<int>();
+    List<float> backUpinputTimeData = new List<float>();
+
+    char[] delimiterChars = {'/',','};
     float startTime;
 
     /// <summary>
-    /// 기록 번호를 요청하면 해당 번호의 건반 값을 리턴해 준다.
+    /// 건반 번호를 기록한 List<int>형식의 데이터 반환
     /// </summary>
-    /// <param name="num">기록 번호</param>
-    /// <returns>건반 값 리턴</returns>
-    public int GetInputData(int num)
+    /// <returns> 건반 값 List<int> </returns>
+    public List<int> GetInputData()
     {
-        int result = -1;
-
-        if (num < inputData.Count)
-            result = inputData[num];
-
-        return result;
+        return inputData.Count > 0 ? 
+                inputData : backUpInputData;
     }
 
     /// <summary>
-    /// 기록 번호를 요청하면 해당 번호의 건반 입력 시간 을 리턴해 준다.
+    /// 건반 번호를 기록한 List<int>형식의 데이터 반환
     /// </summary>
-    /// <param name="num">기록 번호</param>
-    /// <returns>건반 입력 시간 리턴</returns>
-    public float GetInputTimeData(int num)
+    /// <returns> 건반 값 List<int> </returns>
+    public List<float> GetInputTimeData()
     {
-        float result = -1f;
-
-        if (num < inputTimeData.Count)
-            result = inputTimeData[num];
-
-        return result;
+        return inputTimeData.Count > 0 ?
+            inputTimeData : backUpinputTimeData;
     }
 
+    public bool SetData(string data)
+    {
+        string[] datas = data.Split(delimiterChars[0]);
+        string[] stringInputData = datas[0].Split(delimiterChars[1]);
+        string[] stringTimeData = datas[1].Split(delimiterChars[1]);
+        this.inputData = stringInputData.Select(s => int.Parse(s)).ToList();
+        this.inputTimeData = stringTimeData.Select(s => float.Parse(s)).ToList();
+        return this.inputData.Count > 0 && 
+            this.inputTimeData.Count == this.inputData.Count ? true : false;
+    }
+
+    public bool SaveData()
+    {
+        string sInputData = string.Join(',',inputData);
+        string sInputTimeData = string.Join(',', inputTimeData);
+        string saveData = sInputData + '/' + sInputTimeData;
+        return true;
+    }
     /// <summary>
     /// 매개변수 값을 inputData에 추가, 입력 시간 간격을 inputTimeData에 기록한다.
     /// </summary>
@@ -59,6 +76,11 @@ public class MusicRecorder
 
     public void Initialize()
     {
+        if(inputData.Count > 0)
+        {
+            backUpInputData = inputData.ToList<int>();
+            backUpinputTimeData = inputTimeData.ToList<float>();
+        }
         inputData.Clear();
         inputTimeData.Clear();
         startTime = 0f;

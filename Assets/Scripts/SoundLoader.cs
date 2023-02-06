@@ -5,7 +5,7 @@ using UnityEngine.Networking;
 
 public class SoundLoader : MonoBehaviour
 {
-    [SerializeField]List<AudioClip> audioClips;
+    public List<AudioClip> AudioClips { get; set; }
     string directoryPath;
     public string audioTypeName = "aiFf";
     int soundMax = 14;
@@ -13,11 +13,12 @@ public class SoundLoader : MonoBehaviour
     private void Awake()
     {
         directoryPath = Application.dataPath + "/StreamingAssets/Custom/";
+        AudioClips = new List<AudioClip>();
     }
 
     public void AudioLoad()
     {
-        audioClips.Clear();
+        AudioClips.Clear();
         audioTypeName = audioTypeName.ToLower();
         if (audioTypeName != "aiff" && audioTypeName != "wav")
         {
@@ -30,6 +31,27 @@ public class SoundLoader : MonoBehaviour
             {
                 StartCoroutine(AudioLoader(i.ToString(), audioType));
             }
+        }
+    }
+
+    public IEnumerator AudioLoad2(System.Action CompleteCallBack)
+    {
+        AudioClips.Clear();
+        audioTypeName = audioTypeName.ToLower();
+        if (audioTypeName != "aiff" && audioTypeName != "wav")
+        {
+            Debug.LogWarning($"{audioTypeName} : 현재 오디오 타입은 aiff 또는 wav가 아닙니다.");
+        }
+        else
+        {
+            AudioType audioType = audioTypeName == "aiff" ? AudioType.AIFF : AudioType.WAV;
+            for (int i = 0; i < soundMax; i++)
+            {
+                yield return StartCoroutine(AudioLoader(i.ToString(), audioType));
+            }
+            //사운드가 빠른 순서대로 로드 됨. 따라서 마지막 사운드 로드되면 한번 정렬시킨다.
+            if (AudioClips.Count == soundMax) ComplteLoad();
+            CompleteCallBack();
         }
     }
 
@@ -48,17 +70,14 @@ public class SoundLoader : MonoBehaviour
             {
                 AudioClip audioClip = DownloadHandlerAudioClip.GetContent(req);
                 audioClip.name = fileName;
-                audioClips.Add(audioClip);
-
-                //비동기로딩으로 사운드가 빠른 순서대로 로드 됨. 따라서 마지막 사운드 로드되면 한번 정렬시킨다.
-                if (audioClips.Count == soundMax) ComplteLoad();
+                AudioClips.Add(audioClip);
             }
         }
     }
 
     private void ComplteLoad()
     {
-        audioClips.Sort((p1, p2) => int.Parse(p1.name).CompareTo(int.Parse(p2.name)));
+        AudioClips.Sort((p1, p2) => int.Parse(p1.name).CompareTo(int.Parse(p2.name)));
     }
 
     private void LoadErr(string errMsg)
