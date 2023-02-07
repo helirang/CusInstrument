@@ -3,28 +3,26 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Audio;
 using UnityEngine.Events;
+using UnityEngine.InputSystem;
 
 [RequireComponent(typeof(SoundTracks),typeof(SoundLoader),typeof(AudioExtension))]
 public class Instrument : MonoBehaviour
 {
-    public enum EInstrumentMode 
+    public enum ESoundMode 
     { 
         PianoMode,
         CustomMode,
         EditMode
     }
-    EInstrumentMode instrumentMode;
-    public EInstrumentMode InstrumentMode 
+    public enum EInstrumentMode
     {
-        get { return instrumentMode; }
-        set
-        {
-            instrumentMode = value;
-            Debug.Log(instrumentMode);
-            ModeChange(value);
-        }
+        PlayMode,
+        RePlayMode,
+        EditMode
     }
+    EInstrumentMode instrumentMode;
 
+    private PlayerInputActions inputActions;
     #region 커스텀 컴포넌트 && 클래스
     [Header("Custom")]
     [SerializeField] private SoundTracks soundTracks;
@@ -37,11 +35,14 @@ public class Instrument : MonoBehaviour
     private MusicRecorder musicRecorder;
     private bool isRecod = false;
     private bool isReplay = false;
-    private bool isPlayMode = true;
     public bool IsPercussionInstrument { get; set; }
     private IEnumerator replayCoroutine = null;
     public UnityEvent RecordEvenet;
 
+    private void Awake()
+    {
+        KeyboardSetting();
+    }
     private void Start()
     {
         IsPercussionInstrument = !true;
@@ -57,38 +58,58 @@ public class Instrument : MonoBehaviour
 
         AudioSourceGenerations(audioSources,soundTracks.CurrentAudioClips,audioMixerGroup);
         audioExtension.FadeOutSetting(soundTracks.CurrentAudioClips.Count);
-        InstrumentMode = EInstrumentMode.PianoMode;
+        CustomSoundLoad();
+        SoundModeChange(ESoundMode.PianoMode);
+        InstrumentModeChange(EInstrumentMode.PlayMode);
     }
 
-    private void Update()
+    private void OnDisable()
     {
-        if(isPlayMode) 
-            OnKeyboard();
+        inputActions.Disable();
     }
 
-    #region Audio 생성 및 음원 설정 관련 함수
-    public void InstrumentModeChange(int modeNum)
+    #region 컨트롤러 역할의 함수
+    void InstrumentModeChange(EInstrumentMode instrumentMode)
     {
-        InstrumentMode = (EInstrumentMode)modeNum;
-    }
-    void ModeChange(EInstrumentMode modeNum)
-    {
-        RecodrStop();
-        ReplayStop(ref isReplay, replayCoroutine);
-        switch (modeNum)
+        switch (instrumentMode)
         {
-            case EInstrumentMode.PianoMode:
-                SoundChange(false);
-                isPlayMode = true;
+            case EInstrumentMode.PlayMode:
+                ReplayStop(replayCoroutine);
+                inputActions.Enable();
                 break;
-            case EInstrumentMode.CustomMode:
-                SoundChange(true);
-                isPlayMode = true;
+            case EInstrumentMode.RePlayMode:
+                inputActions.Disable();
+                if (isRecod) RecodrStop();
+                replayCoroutine =
+                    Replay(musicRecorder.GetInputData(), musicRecorder.GetInputTimeData());
+                StartCoroutine(replayCoroutine);
                 break;
             case EInstrumentMode.EditMode:
-                isPlayMode = false;
+                inputActions.Disable();
+                ReplayStop(replayCoroutine);
+                RecodrStop();
                 break;
         }
+        this.instrumentMode = instrumentMode;
+    }
+    #endregion
+
+    #region Audio 생성 및 음원 설정 관련 함수
+    void SoundModeChange(ESoundMode modeNum)
+    {
+        switch (modeNum)
+        {
+            case ESoundMode.PianoMode:
+                SoundChange(false);
+                break;
+            case ESoundMode.CustomMode:
+                SoundChange(true);
+                break;
+        }
+    }
+    public void InstrumentSoundModeChange(int modeNum)
+    {
+        SoundModeChange((ESoundMode)modeNum);
     }
 
     /// <summary>
@@ -106,7 +127,7 @@ public class Instrument : MonoBehaviour
             audioSource.outputAudioMixerGroup = audioMixerGroup;
         }
     }
-    void SoundSetting(List<AudioClip> audioClips)
+    void AudioSoundSetting(List<AudioClip> audioClips)
     {
         for (int i = 0; i < audioClips.Count; i++)
         {
@@ -122,7 +143,7 @@ public class Instrument : MonoBehaviour
     void SoundChange(bool isCustom)
     {
         if (soundTracks.ChangeSoundTracks(isCustom))
-            SoundSetting(soundTracks.CurrentAudioClips);
+            AudioSoundSetting(soundTracks.CurrentAudioClips);
     }
     public void CustomSoundLoad()
     {
@@ -135,46 +156,47 @@ public class Instrument : MonoBehaviour
     #endregion
 
     #region 키입력 관련 함수
-    void OnKeyboard()
+    void KeyboardSetting()
     {
-        if (Input.GetKeyDown(KeyCode.A)) Play(0);
-        else if (Input.GetKeyDown(KeyCode.S)) Play(1);
-        else if (Input.GetKeyDown(KeyCode.D)) Play(2);
-        else if (Input.GetKeyDown(KeyCode.F)) Play(3);
-        else if (Input.GetKeyDown(KeyCode.H)) Play(4);
-        else if (Input.GetKeyDown(KeyCode.J)) Play(5);
-        else if (Input.GetKeyDown(KeyCode.K)) Play(6);
-        else if (Input.GetKeyDown(KeyCode.L)) Play(7);
-        else if (Input.GetKeyDown(KeyCode.W)) Play(8);
-        else if (Input.GetKeyDown(KeyCode.E)) Play(9);
-        else if (Input.GetKeyDown(KeyCode.T)) Play(10);
-        else if (Input.GetKeyDown(KeyCode.U)) Play(11);
-        else if (Input.GetKeyDown(KeyCode.I)) Play(12);
-        else if (Input.GetKeyDown(KeyCode.P)) Play(13);
+        inputActions = new PlayerInputActions();
+        inputActions.Instrument.Enable();
+        inputActions.Instrument.C4.started += (InputAction.CallbackContext context) => Play(0); ;
+        inputActions.Instrument.D4.started += (InputAction.CallbackContext context) => Play(1); ;
+        inputActions.Instrument.E4.started += (InputAction.CallbackContext context) => Play(2); ;
+        inputActions.Instrument.F4.started += (InputAction.CallbackContext context) => Play(3); ;
+        inputActions.Instrument.G4.started += (InputAction.CallbackContext context) => Play(4); ;
+        inputActions.Instrument.A4.started += (InputAction.CallbackContext context) => Play(5); ;
+        inputActions.Instrument.B4.started += (InputAction.CallbackContext context) => Play(6); ;
+        inputActions.Instrument.C5.started += (InputAction.CallbackContext context) => Play(7); ;
+        inputActions.Instrument.C4Sharp.started += (InputAction.CallbackContext context) => Play(8); ;
+        inputActions.Instrument.D4Sharp.started += (InputAction.CallbackContext context) => Play(9); ;
+        inputActions.Instrument.F4Sharp.started += (InputAction.CallbackContext context) => Play(10); ;
+        inputActions.Instrument.G4Sharp.started += (InputAction.CallbackContext context) => Play(11); ;
+        inputActions.Instrument.A4Sharp.started += (InputAction.CallbackContext context) => Play(12); ;
+        inputActions.Instrument.C5Sharp.started += (InputAction.CallbackContext context) => Play(13); ;
 
-        if (Input.GetKeyUp(KeyCode.A)) Play(-1);
-        else if (Input.GetKeyUp(KeyCode.S)) Play(-2);
-        else if (Input.GetKeyUp(KeyCode.D)) Play(-3);
-        else if (Input.GetKeyUp(KeyCode.F)) Play(-4);
-        else if (Input.GetKeyUp(KeyCode.H)) Play(-5);
-        else if (Input.GetKeyUp(KeyCode.J)) Play(-6);
-        else if (Input.GetKeyUp(KeyCode.K)) Play(-7);
-        else if (Input.GetKeyUp(KeyCode.L)) Play(-8);
-        else if (Input.GetKeyUp(KeyCode.W)) Play(-9);
-        else if (Input.GetKeyUp(KeyCode.E)) Play(-10);
-        else if (Input.GetKeyUp(KeyCode.T)) Play(-11);
-        else if (Input.GetKeyUp(KeyCode.U)) Play(-12);
-        else if (Input.GetKeyUp(KeyCode.I)) Play(-13);
-        else if (Input.GetKeyUp(KeyCode.P)) Play(-14);
+        inputActions.Instrument.C4.canceled += (InputAction.CallbackContext context) => Play(-1); ;
+        inputActions.Instrument.D4.canceled += (InputAction.CallbackContext context) => Play(-2); ;
+        inputActions.Instrument.E4.canceled += (InputAction.CallbackContext context) => Play(-3); ;
+        inputActions.Instrument.F4.canceled += (InputAction.CallbackContext context) => Play(-4); ;
+        inputActions.Instrument.G4.canceled += (InputAction.CallbackContext context) => Play(-5); ;
+        inputActions.Instrument.A4.canceled += (InputAction.CallbackContext context) => Play(-6); ;
+        inputActions.Instrument.B4.canceled += (InputAction.CallbackContext context) => Play(-7); ;
+        inputActions.Instrument.C5.canceled += (InputAction.CallbackContext context) => Play(-8); ;
+        inputActions.Instrument.C4Sharp.canceled += (InputAction.CallbackContext context) => Play(-9); ;
+        inputActions.Instrument.D4Sharp.canceled += (InputAction.CallbackContext context) => Play(-10); ;
+        inputActions.Instrument.F4Sharp.canceled += (InputAction.CallbackContext context) => Play(-11); ;
+        inputActions.Instrument.G4Sharp.canceled += (InputAction.CallbackContext context) => Play(-12); ;
+        inputActions.Instrument.A4Sharp.canceled += (InputAction.CallbackContext context) => Play(-13); ;
+        inputActions.Instrument.C5Sharp.canceled += (InputAction.CallbackContext context) => Play(-14); ;
     }
     #endregion
 
     #region 연주 관련 함수 (실시간 재생, 악보 재생)
     void Play(int audioNum)
     {
-        if(!IsPercussionInstrument && audioNum < 0)
+        if (!IsPercussionInstrument && audioNum < 0)
         {
-            Debug.Log(audioNum);
             int convertNum = -(audioNum + 1);
             audioExtension.FadeOutStart(convertNum,audioSources[convertNum]);
             if (isRecod)musicRecorder.Record(audioNum);
@@ -189,48 +211,31 @@ public class Instrument : MonoBehaviour
 
     public void ReplayOnOff()
     {
-        Debug.Log(isReplay);
-        if (isReplay) 
-        { 
-            ReplayStop(ref isReplay, replayCoroutine);
-            isPlayMode = true;
-        }
-        else
-        {
-            isPlayMode = false;
-            replayCoroutine =
-                Replay(musicRecorder.GetInputData(), musicRecorder.GetInputTimeData());
-            StartCoroutine(replayCoroutine);
-            if (isRecod) RecodrStop();
-        };
+        if (isReplay) InstrumentModeChange(EInstrumentMode.PlayMode);
+        else InstrumentModeChange(EInstrumentMode.RePlayMode);
     }
 
     IEnumerator Replay(List<int> inputData, List<float> inputTimeData)
     {
-        isReplay = true;
-        Debug.Log(this.isReplay);
         for (int i = 0; i < inputData.Count; i++)
         {
             yield return new WaitForSeconds(inputTimeData[i]);
             Play(inputData[i]);
         }
-        isReplay = false;
-        isPlayMode = true;
+        InstrumentModeChange(EInstrumentMode.PlayMode);
     }
 
-    void ReplayStop(ref bool isWork, IEnumerator enumerator)
+    void ReplayStop(IEnumerator enumerator)
     {
-        if (enumerator != null && isWork)
-        {
-            StopCoroutine(enumerator);
-            isWork = false;
-        }
+        Debug.Log(enumerator);
+        if (enumerator != null) StopCoroutine(enumerator);
     }
     #endregion
 
     #region 악보 기록,로드,저장 관련 함수
     public void RecordOnOff()
     {
+        Debug.Log("RecordStop");
         if (isReplay || isRecod) RecodrStop();
         else Record();
     }
@@ -238,7 +243,7 @@ public class Instrument : MonoBehaviour
     void Record()
     {
         Debug.Log("RecordStart");
-        if (instrumentMode == EInstrumentMode.PianoMode || InstrumentMode == EInstrumentMode.CustomMode)
+        if (instrumentMode == EInstrumentMode.PlayMode)
         {
             musicRecorder.Initialize();
             isRecod = true;
