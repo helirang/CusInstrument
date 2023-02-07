@@ -16,25 +16,7 @@ public class SoundLoader : MonoBehaviour
         AudioClips = new List<AudioClip>();
     }
 
-    public void AudioLoad()
-    {
-        AudioClips.Clear();
-        audioTypeName = audioTypeName.ToLower();
-        if (audioTypeName != "aiff" && audioTypeName != "wav")
-        {
-            Debug.LogWarning($"{audioTypeName} : 현재 오디오 타입은 aiff 또는 wav가 아닙니다.");
-        }
-        else
-        {
-            AudioType audioType = audioTypeName == "aiff" ? AudioType.AIFF : AudioType.WAV;
-            for (int i = 0; i < soundMax; i++)
-            {
-                StartCoroutine(AudioLoader(i.ToString(), audioType));
-            }
-        }
-    }
-
-    public IEnumerator AudioLoad2(System.Action CompleteCallBack)
+    public IEnumerator AudioLoad(System.Action CompleteCallBack)
     {
         AudioClips.Clear();
         audioTypeName = audioTypeName.ToLower();

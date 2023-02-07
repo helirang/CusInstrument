@@ -4,7 +4,7 @@ using UnityEngine;
 using UnityEngine.Audio;
 using UnityEngine.Events;
 
-[RequireComponent(typeof(SoundTracks),typeof(SoundLoader))]
+[RequireComponent(typeof(SoundTracks),typeof(SoundLoader),typeof(AudioExtension))]
 public class Instrument : MonoBehaviour
 {
     public enum EInstrumentMode 
@@ -25,41 +25,39 @@ public class Instrument : MonoBehaviour
         }
     }
 
-    #region 오디오 관련 변수
-    [Header("Audio")]
+    #region 커스텀 컴포넌트 && 클래스
+    [Header("Custom")]
     [SerializeField] private SoundTracks soundTracks;
     [SerializeField] private SoundLoader soundLoader;
-    [SerializeField] private AudioMixerGroup audioMixerGroup;
-    private List<AudioSource> audioSources = new List<AudioSource>();
+    [SerializeField] private AudioExtension audioExtension;
     #endregion
 
+    [SerializeField] private AudioMixerGroup audioMixerGroup;
+    private List<AudioSource> audioSources = new List<AudioSource>();
     private MusicRecorder musicRecorder;
     private bool isRecod = false;
     private bool isReplay = false;
     private bool isPlayMode = true;
     public bool IsPercussionInstrument { get; set; }
     private IEnumerator replayCoroutine = null;
-    private List<IEnumerator> fadeCoroutines = new List<IEnumerator>();
-    private List<bool> isFadeOuts = new List<bool>();
     public UnityEvent RecordEvenet;
 
     private void Start()
     {
+        IsPercussionInstrument = !true;
+
         musicRecorder = new MusicRecorder();
 
         soundTracks = soundTracks == null ? 
             this.gameObject.GetComponent<SoundTracks>() : soundTracks;
         soundLoader = soundLoader == null ?
             this.gameObject.GetComponent<SoundLoader>() : soundLoader;
-        IsPercussionInstrument = !true;
+        audioExtension = audioExtension == null ?
+            this.gameObject.GetComponent<AudioExtension>() : audioExtension;
 
         AudioSourceGenerations(audioSources,soundTracks.CurrentAudioClips,audioMixerGroup);
-        FadeOutSetting(soundTracks.CurrentAudioClips.Count);
+        audioExtension.FadeOutSetting(soundTracks.CurrentAudioClips.Count);
         InstrumentMode = EInstrumentMode.PianoMode;
-    }
-    private void OnDisable()
-    {
-        //DisconnectKeyboard();
     }
 
     private void Update()
@@ -67,24 +65,24 @@ public class Instrument : MonoBehaviour
         if(isPlayMode) 
             OnKeyboard();
     }
+
+    #region Audio 생성 및 음원 설정 관련 함수
     public void InstrumentModeChange(int modeNum)
     {
         InstrumentMode = (EInstrumentMode)modeNum;
     }
     void ModeChange(EInstrumentMode modeNum)
     {
-        RecodrEnd();
-        ReplayEnd(ref isReplay,replayCoroutine);
+        RecodrStop();
+        ReplayStop(ref isReplay, replayCoroutine);
         switch (modeNum)
         {
             case EInstrumentMode.PianoMode:
-                if(soundTracks.ChangeSoundTracks(false))
-                    SoundSetting(soundTracks.CurrentAudioClips);
+                SoundChange(false);
                 isPlayMode = true;
                 break;
             case EInstrumentMode.CustomMode:
-                if (soundTracks.ChangeSoundTracks(true))
-                    SoundSetting(soundTracks.CurrentAudioClips);
+                SoundChange(true);
                 isPlayMode = true;
                 break;
             case EInstrumentMode.EditMode:
@@ -93,7 +91,6 @@ public class Instrument : MonoBehaviour
         }
     }
 
-    #region Audio 및 SoundTracks 관련 함수
     /// <summary>
     /// 오디오 소스 컴포넌트 생성 함수
     /// </summary>
@@ -117,55 +114,23 @@ public class Instrument : MonoBehaviour
             audioSources[i].clip = audioClips[i];
         }
     }
+
+    /// <summary>
+    /// true면 커스텀 음원으로 false면 피아노 음원으로 변경
+    /// </summary>
+    /// <param name="isCustom"></param>
+    void SoundChange(bool isCustom)
+    {
+        if (soundTracks.ChangeSoundTracks(isCustom))
+            SoundSetting(soundTracks.CurrentAudioClips);
+    }
     public void CustomSoundLoad()
     {
-        StartCoroutine(soundLoader.AudioLoad2(CustomSoundSave));
+        StartCoroutine(soundLoader.AudioLoad(CustomSoundSave));
     }
-    void CustomSoundSave()
+    public void CustomSoundSave()
     {
         soundTracks.CustomAudioClips = soundLoader.AudioClips;
-    }
-
-    void FadeOutSetting(int max)
-    {
-        for (int i=0; i < max; i++)
-        {
-            isFadeOuts.Add(false);
-            fadeCoroutines.Add(null);
-        }
-    }
-    void FadeOutStart(int audioNum)
-    {
-        float duration = 1f;
-        float targetVolume = 0f;
-        isFadeOuts[audioNum] = true;
-        fadeCoroutines[audioNum] = FadeOut(audioNum, duration, targetVolume, audioSources[audioNum]);
-        StartCoroutine(fadeCoroutines[audioNum]);
-    }
-    void FadeOutStop(int audioNum,AudioSource audioSource,IEnumerator enumerator)
-    {
-        if (isFadeOuts[audioNum]) 
-        {
-            StopCoroutine(enumerator);
-            audioSource.Stop();
-            audioSource.volume = 1f;
-            isFadeOuts[audioNum] = false;
-        }
-    }
-    IEnumerator FadeOut(int audioNum, float duration,float targetVolume, AudioSource audioSource)
-    {
-        isFadeOuts[audioNum] = true;
-        float currentTime = 0;
-        float start = audioSource.volume;
-        while(currentTime < duration)
-        {
-            currentTime += Time.deltaTime;
-            audioSource.volume = Mathf.Lerp(start, targetVolume, currentTime / duration);
-            yield return null;
-        }
-        audioSource.Stop();
-        audioSource.volume = 1f;
-        isFadeOuts[audioNum] = false;
     }
     #endregion
 
@@ -204,69 +169,43 @@ public class Instrument : MonoBehaviour
     }
     #endregion
 
-    #region 연주 관련 함수 ( 연주, 악보 등 )
+    #region 연주 관련 함수 (실시간 재생, 악보 재생)
     void Play(int audioNum)
     {
         if(!IsPercussionInstrument && audioNum < 0)
         {
             Debug.Log(audioNum);
             int convertNum = -(audioNum + 1);
-            FadeOutStart(convertNum);
-            if(isRecod)musicRecorder.Record(audioNum);
+            audioExtension.FadeOutStart(convertNum,audioSources[convertNum]);
+            if (isRecod)musicRecorder.Record(audioNum);
         }
         else if(audioNum >= 0)
         {
-            FadeOutStop(audioNum, audioSources[audioNum], fadeCoroutines[audioNum]);
+            audioExtension.FadeOutStop(audioNum, audioSources[audioNum]);
             audioSources[audioNum].Play();
             if (isRecod) musicRecorder.Record(audioNum);
         }
     }
 
-    public void LoadSheet(string data)
-    {
-        Debug.Log(data);
-    }
-
-    public void Record()
-    {
-        if (isReplay||isRecod) RecodrEnd();
-        else RecordStart();
-    }
-
-    void RecordStart()
-    {
-        Debug.Log("RecordStart");
-        if(instrumentMode == EInstrumentMode.PianoMode || InstrumentMode == EInstrumentMode.CustomMode)
-        {
-            musicRecorder.Initialize();
-            isRecod = true;
-        }
-    }
-    void RecodrEnd()
-    {
-        RecordEvenet.Invoke();
-        isRecod = false;
-    }
-
-    public void Replay()
+    public void ReplayOnOff()
     {
         Debug.Log(isReplay);
         if (isReplay) 
         { 
-            ReplayEnd(ref isReplay, replayCoroutine);
+            ReplayStop(ref isReplay, replayCoroutine);
             isPlayMode = true;
         }
         else
         {
             isPlayMode = false;
             replayCoroutine =
-                ReplayStart(musicRecorder.GetInputData(), musicRecorder.GetInputTimeData());
+                Replay(musicRecorder.GetInputData(), musicRecorder.GetInputTimeData());
             StartCoroutine(replayCoroutine);
-            if (isRecod) RecodrEnd();
+            if (isRecod) RecodrStop();
         };
     }
 
-    IEnumerator ReplayStart(List<int> inputData, List<float> inputTimeData)
+    IEnumerator Replay(List<int> inputData, List<float> inputTimeData)
     {
         isReplay = true;
         Debug.Log(this.isReplay);
@@ -279,19 +218,44 @@ public class Instrument : MonoBehaviour
         isPlayMode = true;
     }
 
-    void ReplayEnd(ref bool isWork, IEnumerator enumerator)
+    void ReplayStop(ref bool isWork, IEnumerator enumerator)
     {
         if (enumerator != null && isWork)
         {
             StopCoroutine(enumerator);
-            Debug.Log(isReplay);
             isWork = false;
-            Debug.Log(isReplay);
         }
     }
     #endregion
 
-    #region 세이브 관련 함수
+    #region 악보 기록,로드,저장 관련 함수
+    public void RecordOnOff()
+    {
+        if (isReplay || isRecod) RecodrStop();
+        else Record();
+    }
+
+    void Record()
+    {
+        Debug.Log("RecordStart");
+        if (instrumentMode == EInstrumentMode.PianoMode || InstrumentMode == EInstrumentMode.CustomMode)
+        {
+            musicRecorder.Initialize();
+            isRecod = true;
+        }
+    }
+
+    void RecodrStop()
+    {
+        RecordEvenet.Invoke();
+        isRecod = false;
+    }
+
+    public void LoadSheet(string data)
+    {
+        Debug.Log(data);
+    }
+
     public void SaveSheet()
     {
         musicRecorder.SaveData();
