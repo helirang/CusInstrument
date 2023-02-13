@@ -23,8 +23,8 @@ public class AudioExtension :MonoBehaviour
     }
     public void FadeOutStart(int audioNum, AudioSource audioSource)
     {
-        float duration = 1f;
-        float targetVolume = 0f;
+        float duration = 1.5f;
+        float targetVolume = 0.01f;
         isFadeOuts[audioNum] = true;
         fadeCoroutines[audioNum] = FadeOut(audioNum, duration, targetVolume, audioSource);
         StartCoroutine(fadeCoroutines[audioNum]);

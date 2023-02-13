@@ -8,8 +8,9 @@ using UnityEngine.InputSystem;
 [RequireComponent(typeof(SoundTracks),typeof(SoundLoader),typeof(AudioExtension))]
 public class Instrument : MonoBehaviour
 {
-    public enum ESoundMode 
-    { 
+    #region VARIABLES & PROPERTIES
+    public enum ESoundMode
+    {
         PianoMode,
         CustomMode
     }
@@ -22,28 +23,30 @@ public class Instrument : MonoBehaviour
     EInstrumentMode instrumentMode;
 
     private PlayerInputActions inputActions;
-    #region 커스텀 컴포넌트 && 클래스
+
     [Header("Custom")]
     [SerializeField] private SoundTracks soundTracks;
     [SerializeField] private SoundLoader soundLoader;
     [SerializeField] private AudioExtension audioExtension;
-    #endregion
 
     [SerializeField] private AudioMixerGroup audioMixerGroup;
     private List<AudioSource> audioSources = new List<AudioSource>();
     private MusicRecorder musicRecorder;
     private bool isRecod = false;
-    public bool IsPercussionInstrument { get; set; }
     private IEnumerator replayCoroutine = null;
+
+    public bool IsPercussionInstrument { get; set; }
+    #endregion
+
+    #region UNITY_EVENTS
+    [Header("Events")]
     public UnityEvent RecordEvenet;
     public UnityEvent<string> SaveSheetEvent;
+    #endregion
 
-    private void Awake()
-    {
-        KeyboardSetting();
-    }
     private void Start()
     {
+        KeyboardSetting();
         IsPercussionInstrument = !true;
 
         musicRecorder = new MusicRecorder();
@@ -61,13 +64,12 @@ public class Instrument : MonoBehaviour
         SoundModeChange(ESoundMode.PianoMode);
         InstrumentModeChange(EInstrumentMode.PlayMode);
     }
-
     private void OnDisable()
     {
         inputActions.Disable();
     }
 
-    #region 컨트롤러 역할의 함수
+    #region MAIN_FUNCTIONS
     void InstrumentModeChange(EInstrumentMode instrumentMode)
     {
         switch (instrumentMode)
@@ -94,6 +96,50 @@ public class Instrument : MonoBehaviour
     public void ModeChange(int modeNum)
     {
         InstrumentModeChange((EInstrumentMode)modeNum);
+    }
+    #endregion
+
+    #region 연주 관련 함수 (실시간 재생, 악보 재생)
+    void Play(int audioNum)
+    {
+        if (!IsPercussionInstrument && audioNum < 0)
+        {
+            int convertNum = -(audioNum + 1);
+            audioExtension.FadeOutStart(convertNum, audioSources[convertNum]);
+            if (isRecod) musicRecorder.Record(audioNum);
+        }
+        else if (audioNum >= 0)
+        {
+            audioExtension.FadeOutStop(audioNum, audioSources[audioNum]);
+            audioSources[audioNum].Play();
+            if (isRecod) musicRecorder.Record(audioNum);
+        }
+    }
+
+    public void ReplayOnOff()
+    {
+        //@todo 임시코드 악보 입력 ui를 변경하면 삭제할 것.
+        if (instrumentMode == EInstrumentMode.EditMode) return;
+
+        if (instrumentMode == EInstrumentMode.RePlayMode)
+            InstrumentModeChange(EInstrumentMode.PlayMode);
+        else InstrumentModeChange(EInstrumentMode.RePlayMode);
+    }
+
+    IEnumerator Replay(List<int> inputData, List<float> inputTimeData)
+    {
+        for (int i = 0; i < inputData.Count; i++)
+        {
+            yield return new WaitForSeconds(inputTimeData[i]);
+            Play(inputData[i]);
+        }
+        InstrumentModeChange(EInstrumentMode.PlayMode);
+    }
+
+    void ReplayStop(IEnumerator enumerator)
+    {
+        //Debug.Log(enumerator);
+        if (enumerator != null) StopCoroutine(enumerator);
     }
     #endregion
 
@@ -158,87 +204,6 @@ public class Instrument : MonoBehaviour
     }
     #endregion
 
-    #region 키입력 관련 함수
-    void KeyboardSetting()
-    {
-        inputActions = new PlayerInputActions();
-        inputActions.Instrument.Enable();
-        inputActions.Instrument.C4.started += (InputAction.CallbackContext context) => Play(0); ;
-        inputActions.Instrument.D4.started += (InputAction.CallbackContext context) => Play(1); ;
-        inputActions.Instrument.E4.started += (InputAction.CallbackContext context) => Play(2); ;
-        inputActions.Instrument.F4.started += (InputAction.CallbackContext context) => Play(3); ;
-        inputActions.Instrument.G4.started += (InputAction.CallbackContext context) => Play(4); ;
-        inputActions.Instrument.A4.started += (InputAction.CallbackContext context) => Play(5); ;
-        inputActions.Instrument.B4.started += (InputAction.CallbackContext context) => Play(6); ;
-        inputActions.Instrument.C5.started += (InputAction.CallbackContext context) => Play(7); ;
-        inputActions.Instrument.C4Sharp.started += (InputAction.CallbackContext context) => Play(8); ;
-        inputActions.Instrument.D4Sharp.started += (InputAction.CallbackContext context) => Play(9); ;
-        inputActions.Instrument.F4Sharp.started += (InputAction.CallbackContext context) => Play(10); ;
-        inputActions.Instrument.G4Sharp.started += (InputAction.CallbackContext context) => Play(11); ;
-        inputActions.Instrument.A4Sharp.started += (InputAction.CallbackContext context) => Play(12); ;
-        inputActions.Instrument.C5Sharp.started += (InputAction.CallbackContext context) => Play(13); ;
-
-        inputActions.Instrument.C4.canceled += (InputAction.CallbackContext context) => Play(-1); ;
-        inputActions.Instrument.D4.canceled += (InputAction.CallbackContext context) => Play(-2); ;
-        inputActions.Instrument.E4.canceled += (InputAction.CallbackContext context) => Play(-3); ;
-        inputActions.Instrument.F4.canceled += (InputAction.CallbackContext context) => Play(-4); ;
-        inputActions.Instrument.G4.canceled += (InputAction.CallbackContext context) => Play(-5); ;
-        inputActions.Instrument.A4.canceled += (InputAction.CallbackContext context) => Play(-6); ;
-        inputActions.Instrument.B4.canceled += (InputAction.CallbackContext context) => Play(-7); ;
-        inputActions.Instrument.C5.canceled += (InputAction.CallbackContext context) => Play(-8); ;
-        inputActions.Instrument.C4Sharp.canceled += (InputAction.CallbackContext context) => Play(-9); ;
-        inputActions.Instrument.D4Sharp.canceled += (InputAction.CallbackContext context) => Play(-10); ;
-        inputActions.Instrument.F4Sharp.canceled += (InputAction.CallbackContext context) => Play(-11); ;
-        inputActions.Instrument.G4Sharp.canceled += (InputAction.CallbackContext context) => Play(-12); ;
-        inputActions.Instrument.A4Sharp.canceled += (InputAction.CallbackContext context) => Play(-13); ;
-        inputActions.Instrument.C5Sharp.canceled += (InputAction.CallbackContext context) => Play(-14); ;
-    }
-    #endregion
-
-    #region 연주 관련 함수 (실시간 재생, 악보 재생)
-    void Play(int audioNum)
-    {
-        if (!IsPercussionInstrument && audioNum < 0)
-        {
-            int convertNum = -(audioNum + 1);
-            audioExtension.FadeOutStart(convertNum,audioSources[convertNum]);
-            if (isRecod)musicRecorder.Record(audioNum);
-        }
-        else if(audioNum >= 0)
-        {
-            audioExtension.FadeOutStop(audioNum, audioSources[audioNum]);
-            audioSources[audioNum].Play();
-            if (isRecod) musicRecorder.Record(audioNum);
-        }
-    }
-
-    public void ReplayOnOff()
-    {
-        //@todo 임시코드 악보 입력 ui를 변경하면 삭제할 것.
-        if (instrumentMode == EInstrumentMode.EditMode) return;
-
-        if (instrumentMode == EInstrumentMode.RePlayMode) 
-            InstrumentModeChange(EInstrumentMode.PlayMode);
-        else InstrumentModeChange(EInstrumentMode.RePlayMode);
-    }
-
-    IEnumerator Replay(List<int> inputData, List<float> inputTimeData)
-    {
-        for (int i = 0; i < inputData.Count; i++)
-        {
-            yield return new WaitForSeconds(inputTimeData[i]);
-            Play(inputData[i]);
-        }
-        InstrumentModeChange(EInstrumentMode.PlayMode);
-    }
-
-    void ReplayStop(IEnumerator enumerator)
-    {
-        //Debug.Log(enumerator);
-        if (enumerator != null) StopCoroutine(enumerator);
-    }
-    #endregion
-
     #region 악보 기록,로드,저장 관련 함수
     public void RecordOnOff()
     {
@@ -278,6 +243,43 @@ public class Instrument : MonoBehaviour
     void CallBackSave(string data)
     {
         SaveSheetEvent.Invoke(data);
+    }
+    #endregion
+
+    #region 키입력 관련 함수
+    void KeyboardSetting()
+    {
+        inputActions = GameInput.Instance.playerInputActions;
+        inputActions.Instrument.Enable();
+        inputActions.Instrument.C4.started += (InputAction.CallbackContext context) => Play(0); ;
+        inputActions.Instrument.D4.started += (InputAction.CallbackContext context) => Play(1); ;
+        inputActions.Instrument.E4.started += (InputAction.CallbackContext context) => Play(2); ;
+        inputActions.Instrument.F4.started += (InputAction.CallbackContext context) => Play(3); ;
+        inputActions.Instrument.G4.started += (InputAction.CallbackContext context) => Play(4); ;
+        inputActions.Instrument.A4.started += (InputAction.CallbackContext context) => Play(5); ;
+        inputActions.Instrument.B4.started += (InputAction.CallbackContext context) => Play(6); ;
+        inputActions.Instrument.C5.started += (InputAction.CallbackContext context) => Play(7); ;
+        inputActions.Instrument.C4Sharp.started += (InputAction.CallbackContext context) => Play(8); ;
+        inputActions.Instrument.D4Sharp.started += (InputAction.CallbackContext context) => Play(9); ;
+        inputActions.Instrument.F4Sharp.started += (InputAction.CallbackContext context) => Play(10); ;
+        inputActions.Instrument.G4Sharp.started += (InputAction.CallbackContext context) => Play(11); ;
+        inputActions.Instrument.A4Sharp.started += (InputAction.CallbackContext context) => Play(12); ;
+        inputActions.Instrument.C5Sharp.started += (InputAction.CallbackContext context) => Play(13); ;
+
+        inputActions.Instrument.C4.canceled += (InputAction.CallbackContext context) => Play(-1); ;
+        inputActions.Instrument.D4.canceled += (InputAction.CallbackContext context) => Play(-2); ;
+        inputActions.Instrument.E4.canceled += (InputAction.CallbackContext context) => Play(-3); ;
+        inputActions.Instrument.F4.canceled += (InputAction.CallbackContext context) => Play(-4); ;
+        inputActions.Instrument.G4.canceled += (InputAction.CallbackContext context) => Play(-5); ;
+        inputActions.Instrument.A4.canceled += (InputAction.CallbackContext context) => Play(-6); ;
+        inputActions.Instrument.B4.canceled += (InputAction.CallbackContext context) => Play(-7); ;
+        inputActions.Instrument.C5.canceled += (InputAction.CallbackContext context) => Play(-8); ;
+        inputActions.Instrument.C4Sharp.canceled += (InputAction.CallbackContext context) => Play(-9); ;
+        inputActions.Instrument.D4Sharp.canceled += (InputAction.CallbackContext context) => Play(-10); ;
+        inputActions.Instrument.F4Sharp.canceled += (InputAction.CallbackContext context) => Play(-11); ;
+        inputActions.Instrument.G4Sharp.canceled += (InputAction.CallbackContext context) => Play(-12); ;
+        inputActions.Instrument.A4Sharp.canceled += (InputAction.CallbackContext context) => Play(-13); ;
+        inputActions.Instrument.C5Sharp.canceled += (InputAction.CallbackContext context) => Play(-14); ;
     }
     #endregion
 }
