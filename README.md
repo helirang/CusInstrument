@@ -1,9 +1,4 @@
 # CusInstrument
- 
-Piano Key samples by Beskhu on Freesound.org 
-Organ Key samples :
-- G-Town Church Sampling Project" by Tobias Marberger
-- Recorded in his local church in Grebbestad, Sweden by music producer Tobias
 
 <img src="https://user-images.githubusercontent.com/66342017/218859728-7e67f6e0-d180-4dff-8e2b-93d9e3ad0710.png"  width="700" height="370">
 
@@ -27,3 +22,9 @@ Organ Key samples :
 
 - 0~7은 4옥 도,레,미,파,솔,라,시,도(5옥)입니다. { C4 ~ C5 정음 }
 - 8~13은 4옥 도#,레#,파#,솔#,라#,도#(5옥)입니다.
+
+#Credit
+Piano Key samples by Beskhu on Freesound.org 
+Organ Key samples :
+- G-Town Church Sampling Project" by Tobias Marberger
+- Recorded in his local church in Grebbestad, Sweden by music producer Tobias
