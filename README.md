@@ -16,9 +16,8 @@ Organ Key samples :
 - 커스텀 음원 추가 기능 { 유저가 커스텀한 음원을 인게임에 반영할 수 있습니다 }
 - 키 셋팅 변경 기능 { 키 셋팅을 사용자 편의에 맞춰 변경 가능합니다 }
 
-![가이드](https://user-images.githubusercontent.com/66342017/218856927-c3240638-9cb9-420c-8fb6-df1819bc5e6d.JPG)
-
 # 음원 변경 가이드
+![가이드](https://user-images.githubusercontent.com/66342017/218856927-c3240638-9cb9-420c-8fb6-df1819bc5e6d.JPG)
 
 1. Save 또는 SaveBackUp Data 버튼을 클릭
 2. 띄워진 창에서 CustomSound 폴더 클릭
