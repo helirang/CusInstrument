@@ -17,8 +17,7 @@ Organ Key samples :
 - 키 셋팅 변경 기능 { 키 셋팅을 사용자 편의에 맞춰 변경 가능합니다 }
 
 # 음원 변경 가이드
-![가이드](https://user-images.githubusercontent.com/66342017/218856927-c3240638-9cb9-420c-8fb6-df1819bc5e6d.JPG)
-
+<img src="https://user-images.githubusercontent.com/66342017/218856927-c3240638-9cb9-420c-8fb6-df1819bc5e6d.JPG  width="200" height="400"/>
 1. Save 또는 SaveBackUp Data 버튼을 클릭
 2. 띄워진 창에서 CustomSound 폴더 클릭
 3. 경로 복사 후, 해당 경로에 있는 WAV파일을 자신의 파일로 변경
