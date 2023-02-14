@@ -5,7 +5,6 @@ Organ Key samples :
 - G-Town Church Sampling Project" by Tobias Marberger
 - Recorded in his local church in Grebbestad, Sweden by music producer Tobias
 
--이미지
 <img src="https://user-images.githubusercontent.com/66342017/218859728-7e67f6e0-d180-4dff-8e2b-93d9e3ad0710.png"  width="700" height="370">
 
 -기초적인 가이드는 인게임에 포함되어 있습니다.
