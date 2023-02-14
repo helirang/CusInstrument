@@ -23,8 +23,8 @@
 - 0~7은 4옥 도,레,미,파,솔,라,시,도(5옥)입니다. { C4 ~ C5 정음 }
 - 8~13은 4옥 도#,레#,파#,솔#,라#,도#(5옥)입니다.
 
-#Credit
-Piano Key samples by Beskhu on Freesound.org 
-Organ Key samples :
-- G-Town Church Sampling Project" by Tobias Marberger
-- Recorded in his local church in Grebbestad, Sweden by music producer Tobias
+# Credit
+- Piano Key samples by Beskhu on Freesound.org 
+- Organ Key samples :
+a. G-Town Church Sampling Project" by Tobias Marberger
+b. Recorded in his local church in Grebbestad, Sweden by music producer Tobias
