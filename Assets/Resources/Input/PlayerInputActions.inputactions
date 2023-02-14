@@ -1,0 +1,294 @@
+{
+    "name": "PlayerInputActions",
+    "maps": [
+        {
+            "name": "Instrument",
+            "id": "83c4a060-d5a5-421d-841c-5cfdfe39e387",
+            "actions": [
+                {
+                    "name": "C4",
+                    "type": "Button",
+                    "id": "c2b822ef-8bfb-4fef-83b4-b8393f875b6d",
+                    "expectedControlType": "Button",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": false
+                },
+                {
+                    "name": "D4",
+                    "type": "Button",
+                    "id": "64e6ca85-4069-4b21-bfd1-66781732c498",
+                    "expectedControlType": "Button",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": false
+                },
+                {
+                    "name": "E4",
+                    "type": "Button",
+                    "id": "4dda5e82-8e7f-4adf-addf-9c857806d057",
+                    "expectedControlType": "Button",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": false
+                },
+                {
+                    "name": "F4",
+                    "type": "Button",
+                    "id": "85b6e83f-d9d0-469d-8a2e-d37c14ced592",
+                    "expectedControlType": "Button",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": false
+                },
+                {
+                    "name": "G4",
+                    "type": "Button",
+                    "id": "dabc3d11-20de-40fb-8d91-106c1dd4fd21",
+                    "expectedControlType": "Button",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": false
+                },
+                {
+                    "name": "A4",
+                    "type": "Button",
+                    "id": "8eb2b139-b3ca-4af6-9b1a-ba4da70b3b49",
+                    "expectedControlType": "Button",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": false
+                },
+                {
+                    "name": "B4",
+                    "type": "Button",
+                    "id": "50df8668-774f-4dd2-8c99-98eb0acb6b45",
+                    "expectedControlType": "Button",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": false
+                },
+                {
+                    "name": "C5",
+                    "type": "Button",
+                    "id": "05cb7b72-a66b-4791-9915-d323fc2ad79a",
+                    "expectedControlType": "Button",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": false
+                },
+                {
+                    "name": "C4Sharp",
+                    "type": "Button",
+                    "id": "e3941e76-f27e-4f4c-b6a9-aa1beaca959c",
+                    "expectedControlType": "Button",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": false
+                },
+                {
+                    "name": "D4Sharp",
+                    "type": "Button",
+                    "id": "36fd4c47-fcdc-4b35-8145-cd712de3b78a",
+                    "expectedControlType": "Button",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": false
+                },
+                {
+                    "name": "F4Sharp",
+                    "type": "Button",
+                    "id": "6c647e7b-2885-41aa-870f-b61046d9a6a0",
+                    "expectedControlType": "Button",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": false
+                },
+                {
+                    "name": "G4Sharp",
+                    "type": "Button",
+                    "id": "fd7a9682-ea23-4824-b34e-937075292250",
+                    "expectedControlType": "Button",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": false
+                },
+                {
+                    "name": "A4Sharp",
+                    "type": "Button",
+                    "id": "c314539f-8a3d-45fc-9f68-62ac757144dd",
+                    "expectedControlType": "Button",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": false
+                },
+                {
+                    "name": "C5Sharp",
+                    "type": "Button",
+                    "id": "549dc78d-bb7d-43cc-81c6-7c363c1e03a0",
+                    "expectedControlType": "Button",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": false
+                }
+            ],
+            "bindings": [
+                {
+                    "name": "",
+                    "id": "5e3e4cdb-ddc0-4afb-b440-29fec3b6ff6c",
+                    "path": "<Keyboard>/a",
+                    "interactions": "Press(behavior=2)",
+                    "processors": "",
+                    "groups": "",
+                    "action": "C4",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "76a30e1f-be51-40e8-a153-60f1796e9a22",
+                    "path": "<Keyboard>/s",
+                    "interactions": "Press(behavior=2)",
+                    "processors": "",
+                    "groups": "",
+                    "action": "D4",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "33476737-9386-4a4c-9d41-d0dc489dbbfc",
+                    "path": "<Keyboard>/d",
+                    "interactions": "Press(behavior=2)",
+                    "processors": "",
+                    "groups": "",
+                    "action": "E4",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "43fb1a33-ac08-46d6-a582-c7a72e46bd57",
+                    "path": "<Keyboard>/f",
+                    "interactions": "Press(behavior=2)",
+                    "processors": "",
+                    "groups": "",
+                    "action": "F4",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "6496fbbb-52a3-4ca4-af91-be4645079470",
+                    "path": "<Keyboard>/h",
+                    "interactions": "Press(behavior=2)",
+                    "processors": "",
+                    "groups": "",
+                    "action": "G4",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "3cfc106d-3ab5-4cd2-a0aa-76f8dbe4bd10",
+                    "path": "<Keyboard>/j",
+                    "interactions": "Press(behavior=2)",
+                    "processors": "",
+                    "groups": "",
+                    "action": "A4",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "e4e8f2b2-eb98-44d3-8a08-df81ef7b19bc",
+                    "path": "<Keyboard>/k",
+                    "interactions": "Press(behavior=2)",
+                    "processors": "",
+                    "groups": "",
+                    "action": "B4",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "6c4ac425-7557-456e-8526-1fd0bd0e377b",
+                    "path": "<Keyboard>/l",
+                    "interactions": "Press(behavior=2)",
+                    "processors": "",
+                    "groups": "",
+                    "action": "C5",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "c424c5da-5699-4cb4-9e7d-f94a11e749c8",
+                    "path": "<Keyboard>/w",
+                    "interactions": "Press(behavior=2)",
+                    "processors": "",
+                    "groups": "",
+                    "action": "C4Sharp",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "92884957-86ec-4892-8451-15476c121cc8",
+                    "path": "<Keyboard>/e",
+                    "interactions": "Press(behavior=2)",
+                    "processors": "",
+                    "groups": "",
+                    "action": "D4Sharp",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "d18d4fc5-9f8d-4840-946e-7ff6d485dae4",
+                    "path": "<Keyboard>/t",
+                    "interactions": "Press(behavior=2)",
+                    "processors": "",
+                    "groups": "",
+                    "action": "F4Sharp",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "8cf477c7-aaef-4db5-b020-e154bd37d3d8",
+                    "path": "<Keyboard>/u",
+                    "interactions": "Press(behavior=2)",
+                    "processors": "",
+                    "groups": "",
+                    "action": "G4Sharp",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "0e15c471-a22d-49b6-a828-8f308ac7ae41",
+                    "path": "<Keyboard>/i",
+                    "interactions": "Press(behavior=2)",
+                    "processors": "",
+                    "groups": "",
+                    "action": "A4Sharp",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "87383bb1-6279-4432-b38b-45888da84e0a",
+                    "path": "<Keyboard>/p",
+                    "interactions": "Press(behavior=2)",
+                    "processors": "",
+                    "groups": "",
+                    "action": "C5Sharp",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                }
+            ]
+        }
+    ],
+    "controlSchemes": []
+}
