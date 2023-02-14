@@ -18,6 +18,7 @@ Organ Key samples :
 
 # 음원 변경 가이드
 <img src="https://user-images.githubusercontent.com/66342017/218858153-01fdfe58-f578-49e7-9506-ae3c634d3d16.JPG"  width="700" height="370">
+
 1. Save 또는 SaveBackUp Data 버튼을 클릭
 2. 띄워진 창에서 CustomSound 폴더 클릭
 3. 경로 복사 후, 해당 경로에 있는 WAV파일을 자신의 파일로 변경
