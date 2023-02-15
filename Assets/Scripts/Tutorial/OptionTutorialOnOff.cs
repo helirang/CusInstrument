@@ -31,6 +31,11 @@ public class OptionTutorialOnOff : MonoBehaviour
         this.gameObject.SetActive(true);
     }
 
+    private void OnDestroy()
+    {
+        CloseGuide();
+    }
+
     void CloseGuide()
     {
         openBtn.onClick.RemoveListener(OnTutorial);

@@ -9,6 +9,7 @@ public class SoundLoader : MonoBehaviour
     string directoryPath;
     public string audioTypeName = "aiFf";
     int soundMax = 14;
+    UnityWebRequest req;
 
     private void Awake()
     {
@@ -29,7 +30,22 @@ public class SoundLoader : MonoBehaviour
             AudioType audioType = audioTypeName == "aiff" ? AudioType.AIFF : AudioType.WAV;
             for (int i = 0; i < soundMax; i++)
             {
-                yield return StartCoroutine(AudioLoader(i.ToString(), audioType));
+                string fileName = i.ToString();
+                string filePath = $"{directoryPath}{fileName}.{audioType}";
+                req = UnityWebRequestMultimedia.GetAudioClip(filePath, audioType);
+                yield return req.SendWebRequest();
+                if (req.result == UnityWebRequest.Result.ConnectionError || req.result == UnityWebRequest.Result.ProtocolError)
+                {
+                    //Debug.LogWarning(req.error + "\n" + filePath);
+                    LoadErr(req.error + "\n" + filePath);
+                }
+                else
+                {
+                    AudioClip audioClip = DownloadHandlerAudioClip.GetContent(req);
+                    audioClip.name = fileName;
+                    AudioClips.Add(audioClip);
+                }
+                req.Dispose();
             }
             //사운드가 빠른 순서대로 로드 됨. 따라서 마지막 사운드 로드되면 한번 정렬시킨다.
             if (AudioClips.Count == soundMax) ComplteLoad();
@@ -37,24 +53,9 @@ public class SoundLoader : MonoBehaviour
         }
     }
 
-    private IEnumerator AudioLoader(string fileName , AudioType audioType)
+    private void OnApplicationQuit()
     {
-        string filePath = $"{directoryPath}{fileName}.{audioType}";
-        using (UnityWebRequest req = UnityWebRequestMultimedia.GetAudioClip(filePath, audioType))
-        {
-            yield return req.SendWebRequest();
-            if (req.result == UnityWebRequest.Result.ConnectionError || req.result == UnityWebRequest.Result.ProtocolError)
-            {
-                //Debug.LogWarning(req.error + "\n" + filePath);
-                LoadErr(req.error + "\n" + filePath);
-            }
-            else
-            {
-                AudioClip audioClip = DownloadHandlerAudioClip.GetContent(req);
-                audioClip.name = fileName;
-                AudioClips.Add(audioClip);
-            }
-        }
+        req.Dispose();
     }
 
     private void ComplteLoad()

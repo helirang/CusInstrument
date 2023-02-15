@@ -27,6 +27,7 @@ public class TutorialOnOff : MonoBehaviour
         PlayerPrefs.SetInt(tutorialKey, 1);
         closeBtn.onClick.RemoveListener(CloseMainTutorial);
     }
+
     void CloseMainTutorial()
     {
         this.gameObject.SetActive(false);

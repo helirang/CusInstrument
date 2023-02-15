@@ -33,6 +33,11 @@ public class GameInput : MonoBehaviour
         playerInputActions = new PlayerInputActions();
     }
 
+    private void OnApplicationQuit()
+    {
+        StopAllCoroutines();
+    }
+
     public string GetBindingText(int num)
     {
         Binding binding = (Binding)num;
