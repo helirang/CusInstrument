@@ -14,6 +14,7 @@ public class OptionUI : MonoBehaviour
     List<Button> keyBtns;
 
     private PlayerInputActions inputActions;
+
     void Start()
     {
         keyTextUIs = new List<TextMeshProUGUI>();

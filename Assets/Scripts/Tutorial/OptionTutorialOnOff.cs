@@ -31,7 +31,7 @@ public class OptionTutorialOnOff : MonoBehaviour
         this.gameObject.SetActive(true);
     }
 
-    private void OnDestroy()
+    private void OnDisable()
     {
         CloseGuide();
     }

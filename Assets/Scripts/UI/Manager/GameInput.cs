@@ -25,17 +25,18 @@ public class GameInput : MonoBehaviour
     public static GameInput Instance { get; private set; }
 
     public PlayerInputActions playerInputActions { get; private set; }
-
+    readonly string rebindKey = "rebind";
     private void Awake()
     {
         Instance = this;
 
         playerInputActions = new PlayerInputActions();
+        LoadUserRebinds(playerInputActions);
     }
 
-    private void OnApplicationQuit()
+    private void OnDisable()
     {
-        StopAllCoroutines();
+        SaveUserInputRebinds(playerInputActions);
     }
 
     public string GetBindingText(int num)
@@ -147,5 +148,18 @@ public class GameInput : MonoBehaviour
                     OnComplete(callback => RebindingCompress(callback, OnActionRebound)).Start();
                 break;
         }
+    }
+
+    void SaveUserInputRebinds(PlayerInputActions inputActions)
+    {
+        var rebinds = inputActions.SaveBindingOverridesAsJson();
+        PlayerPrefs.SetString(rebindKey, rebinds);
+    }
+
+    void LoadUserRebinds(PlayerInputActions inputActions)
+    {
+        var rebinds = PlayerPrefs.GetString(rebindKey, "None");
+        if (rebinds != "None")
+            inputActions.LoadBindingOverridesFromJson(rebinds);
     }
 }

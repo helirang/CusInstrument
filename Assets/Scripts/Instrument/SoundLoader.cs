@@ -17,6 +17,12 @@ public class SoundLoader : MonoBehaviour
         AudioClips = new List<AudioClip>();
     }
 
+    private void OnDisable()
+    {
+        StopAllCoroutines();
+        req.Dispose();
+    }
+
     public IEnumerator AudioLoad(System.Action CompleteCallBack)
     {
         AudioClips.Clear();
@@ -51,11 +57,6 @@ public class SoundLoader : MonoBehaviour
             if (AudioClips.Count == soundMax) ComplteLoad();
             CompleteCallBack();
         }
-    }
-
-    private void OnApplicationQuit()
-    {
-        req.Dispose();
     }
 
     private void ComplteLoad()
